@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Line Attendance - Shift System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light: #f8fafc;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Shift Selector */
+        .shift-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px;
+            background: #f0f9ff;
+        }
+
+        .shift-btn {
+            padding: 16px 12px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .shift-btn:hover,
+        .shift-btn:active {
+            border-color: #93c5fd;
+            transform: scale(0.98);
+        }
+
+        .shift-btn.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .shift-btn .icon {
+            font-size: 2rem;
+            margin-bottom: 6px;
+        }
+
+        .shift-btn .label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .shift-btn .time {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 3px;
+        }
+
+        /* Section Selector (Night only) */
+        .section-selector {
+            display: none;
+            padding: 14px 16px;
+            background: #fef3c7;
+            border-bottom: 1px solid #fcd34d;
+        }
+
+        .section-selector.visible {
+            display: block;
+        }
+
+        .section-selector label {
+            font-weight: 600;
+            color: #92400e;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .section-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .section-btn {
+            flex: 1;
+            padding: 14px 12px;
+            border: 2px solid #fcd34d;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #92400e;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .section-btn:hover,
+        .section-btn:active {
+            background: #fef9c3;
+        }
+
+        .section-btn.active {
+            background: var(--warning);
+            color: white;
+            border-color: var(--warning);
+        }
+
+        /* Line Selector */
+        .line-selector {
+            padding: 14px 16px;
+            background: var(--light);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .line-selector label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .line-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            max-height: 160px;
+            overflow-y: auto;
+            padding: 2px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .line-btn {
+            padding: 10px 6px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #475569;
+            transition: all 0.2s;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .line-btn:hover,
+        .line-btn:active {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .line-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Category color indicators */
+        .line-btn.category-5s {
+            border-left: 4px solid var(--success);
+        }
+
+        .line-btn.category-asm {
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .line-btn.category-pro {
+            border-left: 4px solid var(--warning);
+        }
+
+        .line-btn.category-tpl {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            color: white;
+        }
+
+        .summary-card .number {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .summary-card .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .summary-card.required .number {
+            color: #93c5fd;
+        }
+
+        .summary-card.present .number {
+            color: #86efac;
+        }
+
+        .summary-card.missing .number {
+            color: #fca5a5;
+        }
+
+        /* Employee List */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--dark);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .list-header h3 {
+            font-size: 0.85rem;
+        }
+
+        .bulk-btn {
+            padding: 8px 12px;
+            background: var(--success);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bulk-btn:active {
+            background: #059669;
+            transform: scale(0.95);
+        }
+
+        .employee-list {
+            max-height: 300px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .employee-card {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .employee-card:active {
+            background: #f1f5f9;
+        }
+
+        .employee-card.checked {
+            background: #ecfdf5;
+        }
+
+        .checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .employee-card.checked .checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkbox svg {
+            display: none;
+            color: white;
+        }
+
+        .employee-card.checked .checkbox svg {
+            display: block;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .employee-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .employee-company {
+            color: #9ca3af;
+            font-size: 0.7rem;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .status-badge.present {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-badge.absent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* Actions - Fixed at bottom on mobile */
+        .actions {
+            display: flex;
+            gap: 10px;
+            padding: 14px 16px;
+            background: var(--light);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:active {
+            background: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            z-index: 100;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* ============ TABLET (768px+) ============ */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 20px 24px;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .shift-selector {
+                padding: 20px 24px;
+                gap: 16px;
+            }
+
+            .shift-btn {
+                padding: 20px;
+            }
+
+            .shift-btn .icon {
+                font-size: 2.5rem;
+            }
+
+            .shift-btn .label {
+                font-size: 1.1rem;
+            }
+
+            .section-selector {
+                padding: 16px 24px;
+            }
+
+            .section-btn {
+                padding: 16px;
+            }
+
+            .line-selector {
+                padding: 16px 24px;
+            }
+
+            .line-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+                max-height: 180px;
+            }
+
+            .line-btn {
+                padding: 12px 8px;
+                font-size: 0.8rem;
+            }
+
+            .summary-cards {
+                padding: 20px 24px;
+                gap: 16px;
+            }
+
+            .summary-card {
+                padding: 16px;
+            }
+
+            .summary-card .number {
+                font-size: 2.2rem;
+            }
+
+            .summary-card .label {
+                font-size: 0.8rem;
+            }
+
+            .list-header {
+                padding: 14px 24px;
+            }
+
+            .list-header h3 {
+                font-size: 0.95rem;
+            }
+
+            .bulk-btn {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+
+            .employee-list {
+                max-height: 350px;
+            }
+
+            .employee-card {
+                padding: 14px 24px;
+            }
+
+            .avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 0.95rem;
+            }
+
+            .employee-name {
+                font-size: 0.95rem;
+            }
+
+            .employee-company {
+                font-size: 0.75rem;
+            }
+
+            .status-badge {
+                font-size: 0.75rem;
+                padding: 5px 12px;
+            }
+
+            .actions {
+                padding: 16px 24px;
+            }
+
+            .btn {
+                padding: 16px 24px;
+                font-size: 1rem;
+            }
+
+            .toast {
+                bottom: 30px;
+            }
+        }
+
+        /* ============ DESKTOP (1024px+) ============ */
+        @media (min-width: 1024px) {
+            .line-grid {
+                grid-template-columns: repeat(9, 1fr);
+                max-height: 120px;
+            }
+
+            .line-btn {
+                font-size: 0.85rem;
+            }
+
+            .employee-list {
+                max-height: 400px;
+            }
+
+            .actions {
+                justify-content: flex-end;
+            }
+
+            .btn {
+                flex: none;
+                min-width: 160px;
+            }
+        }
+
+        /* ============ SMALL MOBILE (< 360px) ============ */
+        @media (max-width: 359px) {
+            body {
+                padding: 8px;
+            }
+
+            .header {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .date-badge {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+
+            .shift-selector {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .shift-btn {
+                padding: 12px 8px;
+            }
+
+            .shift-btn .icon {
+                font-size: 1.6rem;
+            }
+
+            .shift-btn .label {
+                font-size: 0.8rem;
+            }
+
+            .shift-btn .time {
+                font-size: 0.65rem;
+            }
+
+            .section-btns {
+                gap: 8px;
+            }
+
+            .section-btn {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+
+            .line-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .line-btn {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+
+            .summary-card .number {
+                font-size: 1.5rem;
+            }
+
+            .summary-card .label {
+                font-size: 0.6rem;
+            }
+
+            .checkbox {
+                width: 24px;
+                height: 24px;
+                margin-right: 10px;
+            }
+
+            .avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 0.75rem;
+                margin-right: 10px;
+            }
+
+            .employee-name {
+                font-size: 0.85rem;
+            }
+
+            .status-badge {
+                padding: 3px 8px;
+                font-size: 0.65rem;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Landscape mode for phones */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .shift-selector {
+                grid-template-columns: 1fr 1fr;
+                padding: 10px 16px;
+            }
+
+            .shift-btn {
+                padding: 10px;
+            }
+
+            .shift-btn .icon {
+                font-size: 1.5rem;
+                margin-bottom: 4px;
+            }
+
+            .shift-btn .label {
+                font-size: 0.85rem;
+            }
+
+            .summary-cards {
+                padding: 10px 16px;
+            }
+
+            .summary-card {
+                padding: 8px;
+            }
+
+            .summary-card .number {
+                font-size: 1.5rem;
+            }
+
+            .employee-list {
+                max-height: 150px;
+            }
+
+            .employee-card {
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏭 Daily Line Attendance</h1>
+            <div class="date-badge">📅 <span id="current-date"></span></div>
+        </div>
+
+        <!-- Shift Selector -->
+        <div class="shift-selector">
+            <div class="shift-btn" id="shift-day" onclick="selectShift('day')">
+                <div class="icon">🌅</div>
+                <div class="label">Day Shift</div>
+                <div class="time">กะกลางวัน 08:00-17:00</div>
+            </div>
+            <div class="shift-btn" id="shift-night" onclick="selectShift('night')">
+                <div class="icon">🌙</div>
+                <div class="label">Night Shift</div>
+                <div class="time">กะกลางคืน 20:00-05:00</div>
+            </div>
+        </div>
+
+        <!-- Section Selector (Night only) -->
+        <div class="section-selector" id="section-selector">
+            <label>🌙 Select Night Section / เลือกเซคชั่น</label>
+            <div class="section-btns">
+                <button class="section-btn" id="section-ab" onclick="selectSection('AB')">Section A/B</button>
+                <button class="section-btn" id="section-cd" onclick="selectSection('CD')">Section C/D</button>
+            </div>
+        </div>
+
+        <!-- Line Selector -->
+        <div class="line-selector">
+            <label>🏭 Select Line / เลือกสายการผลิต</label>
+            <div class="line-grid" id="line-grid"></div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card required">
+                <div class="number" id="required-count">0</div>
+                <div class="label">Required / ต้องการ</div>
+            </div>
+            <div class="summary-card present">
+                <div class="number" id="present-count">0</div>
+                <div class="label">Present / มา</div>
+            </div>
+            <div class="summary-card missing">
+                <div class="number" id="missing-count">0</div>
+                <div class="label">Missing / ขาด</div>
+            </div>
+        </div>
+
+        <!-- Employee List -->
+        <div class="list-header">
+            <h3>👷 Employees / พนักงาน</h3>
+            <button class="bulk-btn" onclick="markAllPresent()">✅ All Present</button>
+        </div>
+
+        <div class="employee-list" id="employee-list">
+            <div class="empty-state">👆 Select Shift → Section → Line<br>เลือก กะ → เซคชั่น → สาย</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="saveDraft()">💾 Save</button>
+            <button class="btn btn-primary" onclick="submitAttendance()">✅ Submit</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+    <script>
+        // Manufacturing Lines (27 total)
+        const lines = [
+            { code: '5S', category: '5s' },
+            { code: 'ASM2', category: 'asm' },
+            { code: 'ASM3-1', category: 'asm' },
+            { code: 'ASM3-2', category: 'asm' },
+            { code: 'ASM4', category: 'asm' },
+            { code: 'ASM5', category: 'asm' },
+            { code: 'ASM6', category: 'asm' },
+            { code: 'ASM7-1', category: 'asm' },
+            { code: 'ASM7-2', category: 'asm' },
+            { code: 'ASM7-3', category: 'asm' },
+            { code: 'ASM8', category: 'asm' },
+            { code: 'ASM9', category: 'asm' },
+            { code: 'PRO1', category: 'pro' },
+            { code: 'PRO2', category: 'pro' },
+            { code: 'PRO4', category: 'pro' },
+            { code: 'PRO5', category: 'pro' },
+            { code: 'PRO7', category: 'pro' },
+            { code: 'PRO8', category: 'pro' },
+            { code: 'TPL1', category: 'tpl' },
+            { code: 'TPL2', category: 'tpl' },
+            { code: 'TPL3', category: 'tpl' },
+            { code: 'TPL4', category: 'tpl' },
+            { code: 'TPL5', category: 'tpl' },
+            { code: 'TPL6', category: 'tpl' },
+            { code: 'TPL7', category: 'tpl' },
+            { code: 'TPL8', category: 'tpl' },
+            { code: 'TPL9', category: 'tpl' }
+        ];
+
+        // Sample headcount requirements
+        const requirements = {
+            '5S': { day: 3, night_AB: 2, night_CD: 1 },
+            'ASM2': { day: 8, night_AB: 4, night_CD: 4 },
+            'ASM3-1': { day: 6, night_AB: 3, night_CD: 3 },
+            'ASM3-2': { day: 6, night_AB: 3, night_CD: 3 },
+            'ASM4': { day: 7, night_AB: 4, night_CD: 3 },
+            'ASM5': { day: 8, night_AB: 4, night_CD: 4 },
+            'ASM6': { day: 7, night_AB: 3, night_CD: 4 },
+            'ASM7-1': { day: 5, night_AB: 3, night_CD: 2 },
+            'ASM7-2': { day: 5, night_AB: 2, night_CD: 3 },
+            'ASM7-3': { day: 5, night_AB: 3, night_CD: 2 },
+            'ASM8': { day: 6, night_AB: 3, night_CD: 3 },
+            'ASM9': { day: 6, night_AB: 3, night_CD: 3 },
+            'PRO1': { day: 5, night_AB: 3, night_CD: 2 },
+            'PRO2': { day: 4, night_AB: 2, night_CD: 1 },
+            'PRO4': { day: 6, night_AB: 3, night_CD: 3 },
+            'PRO5': { day: 5, night_AB: 2, night_CD: 3 },
+            'PRO7': { day: 7, night_AB: 4, night_CD: 3 },
+            'PRO8': { day: 6, night_AB: 3, night_CD: 3 },
+            'TPL1': { day: 4, night_AB: 2, night_CD: 2 },
+            'TPL2': { day: 5, night_AB: 3, night_CD: 2 },
+            'TPL3': { day: 4, night_AB: 2, night_CD: 2 },
+            'TPL4': { day: 5, night_AB: 2, night_CD: 3 },
+            'TPL5': { day: 4, night_AB: 2, night_CD: 2 },
+            'TPL6': { day: 5, night_AB: 3, night_CD: 2 },
+            'TPL7': { day: 4, night_AB: 2, night_CD: 2 },
+            'TPL8': { day: 5, night_AB: 2, night_CD: 3 },
+            'TPL9': { day: 4, night_AB: 2, night_CD: 2 }
+        };
+
+        const thaiNames = [
+            { th: 'สมชาย ใจดี', en: 'Somchai', i: 'SC' },
+            { th: 'สุภาพร สุขใจ', en: 'Supaporn', i: 'SP' },
+            { th: 'วิชัย มั่นคง', en: 'Wichai', i: 'WC' },
+            { th: 'นารี รักงาน', en: 'Naree', i: 'NR' },
+            { th: 'ประเสริฐ ดีมาก', en: 'Prasert', i: 'PS' },
+            { th: 'มาลี สดใส', en: 'Malee', i: 'ML' },
+            { th: 'อนุชา เก่งกาจ', en: 'Anucha', i: 'AC' },
+            { th: 'พิมพา รุ่งเรือง', en: 'Pimpa', i: 'PP' },
+            { th: 'ธนา สมบูรณ์', en: 'Thana', i: 'TN' },
+            { th: 'รัตนา ดีงาม', en: 'Rattana', i: 'RT' }
+        ];
+        const companies = ['ABC Manpower', 'XYZ Staffing', 'Thai Labor'];
+
+        let currentShift = null;
+        let currentSection = null;
+        let currentLine = null;
+        let checkedIds = new Set();
+        let currentEmployees = [];
+
+        function init() {
+            const now = new Date();
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric'
+            });
+            renderLines();
+        }
+
+        function renderLines() {
+            const grid = document.getElementById('line-grid');
+            grid.innerHTML = lines.map(line => `
+                <button class="line-btn category-${line.category}" id="line-${line.code}" onclick="selectLine('${line.code}')">
+                    ${line.code}
+                </button>
+            `).join('');
+        }
+
+        function selectShift(shift) {
+            currentShift = shift;
+            currentSection = shift === 'day' ? null : currentSection;
+
+            document.getElementById('shift-day').classList.toggle('active', shift === 'day');
+            document.getElementById('shift-night').classList.toggle('active', shift === 'night');
+            document.getElementById('section-selector').classList.toggle('visible', shift === 'night');
+
+            if (shift === 'day') {
+                currentSection = null;
+                document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+            }
+            updateEmployeeList();
+        }
+
+        function selectSection(section) {
+            currentSection = section;
+            document.getElementById('section-ab').classList.toggle('active', section === 'AB');
+            document.getElementById('section-cd').classList.toggle('active', section === 'CD');
+            updateEmployeeList();
+        }
+
+        function selectLine(lineCode) {
+            currentLine = lineCode;
+            document.querySelectorAll('.line-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`line-${lineCode}`).classList.add('active');
+            updateEmployeeList();
+        }
+
+        function getRequiredCount() {
+            if (!currentLine || !currentShift) return 0;
+            const req = requirements[currentLine];
+            if (!req) return 0;
+            if (currentShift === 'day') return req.day;
+            if (currentShift === 'night' && currentSection === 'AB') return req.night_AB;
+            if (currentShift === 'night' && currentSection === 'CD') return req.night_CD;
+            return 0;
+        }
+
+        function generateEmployees(count) {
+            const employees = [];
+            for (let i = 0; i < count; i++) {
+                const name = thaiNames[i % thaiNames.length];
+                const company = companies[i % companies.length];
+                employees.push({ id: i + 1, nameTh: name.th, initials: name.i, company: company });
+            }
+            return employees;
+        }
+
+        function updateEmployeeList() {
+            const listEl = document.getElementById('employee-list');
+
+            if (!currentShift) {
+                listEl.innerHTML = '<div class="empty-state">👆 Select Shift first<br>เลือกกะก่อน</div>';
+                updateSummary(0, 0);
+                return;
+            }
+            if (currentShift === 'night' && !currentSection) {
+                listEl.innerHTML = '<div class="empty-state">👆 Select Section (A/B or C/D)<br>เลือกเซคชั่น</div>';
+                updateSummary(0, 0);
+                return;
+            }
+            if (!currentLine) {
+                listEl.innerHTML = '<div class="empty-state">👆 Select Line<br>เลือกสายการผลิต</div>';
+                updateSummary(0, 0);
+                return;
+            }
+
+            const required = getRequiredCount();
+            currentEmployees = generateEmployees(required);
+            checkedIds.clear();
+            renderEmployees();
+            updateSummary(required, 0);
+        }
+
+        function renderEmployees() {
+            const listEl = document.getElementById('employee-list');
+            if (currentEmployees.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">No employees</div>';
+                return;
+            }
+            listEl.innerHTML = currentEmployees.map(emp => `
+                <div class="employee-card ${checkedIds.has(emp.id) ? 'checked' : ''}" onclick="toggleEmployee(${emp.id})">
+                    <div class="checkbox">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="avatar">${emp.initials}</div>
+                    <div class="employee-info">
+                        <div class="employee-name">${emp.nameTh}</div>
+                        <div class="employee-company">🏢 ${emp.company}</div>
+                    </div>
+                    <span class="status-badge ${checkedIds.has(emp.id) ? 'present' : 'absent'}">
+                        ${checkedIds.has(emp.id) ? '✅' : '❌'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function toggleEmployee(id) {
+            if (checkedIds.has(id)) checkedIds.delete(id);
+            else checkedIds.add(id);
+            renderEmployees();
+            updateSummary(getRequiredCount(), checkedIds.size);
+        }
+
+        function markAllPresent() {
+            if (currentEmployees.length === 0) return;
+            currentEmployees.forEach(emp => checkedIds.add(emp.id));
+            renderEmployees();
+            updateSummary(getRequiredCount(), checkedIds.size);
+            showToast('All present! ✅', 'success');
+        }
+
+        function updateSummary(required, present) {
+            document.getElementById('required-count').textContent = required;
+            document.getElementById('present-count').textContent = present;
+            document.getElementById('missing-count').textContent = Math.max(0, required - present);
+        }
+
+        function saveDraft() { showToast('Saved! 💾', 'success'); }
+
+        function submitAttendance() {
+            if (!currentShift || !currentLine) {
+                showToast('Select shift and line!', '');
+                return;
+            }
+            if (currentShift === 'night' && !currentSection) {
+                showToast('Select section!', '');
+                return;
+            }
+            const required = getRequiredCount();
+            const present = checkedIds.size;
+            const missing = required - present;
+
+            if (missing > 0 && !confirm(`⚠️ ${missing} missing. Submit anyway?`)) return;
+
+            const label = currentShift === 'day' ? 'Day' : `Night ${currentSection}`;
+            showToast(`✅ ${currentLine} ${label}: ${present}/${required}`, 'success');
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast show' + (type ? ` ${type}` : '');
+            document.getElementById('toast-msg').textContent = msg;
+            setTimeout(() => { toast.className = 'toast'; }, 2500);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

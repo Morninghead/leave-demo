@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Headcount Configuration - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light: #f8fafc;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-header {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-header.save {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-header.save:hover {
+            background: #059669;
+        }
+
+        .btn-header.back {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-header.back:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Summary Stats */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--dark);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-card .number {
+            font-size: 1.6rem;
+            font-weight: bold;
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .stat-card.lines .number {
+            color: #93c5fd;
+        }
+
+        .stat-card.day .number {
+            color: #fcd34d;
+        }
+
+        .stat-card.night-ab .number {
+            color: #a78bfa;
+        }
+
+        .stat-card.night-cd .number {
+            color: #f472b6;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 14px 20px;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: #e0f2fe;
+        }
+
+        .tab.active {
+            color: var(--primary-dark);
+            background: white;
+            border-bottom-color: var(--primary);
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        th.center {
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        tr:hover {
+            background: #fafafa;
+        }
+
+        .line-code {
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .line-code .badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge.cat-5s {
+            background: var(--success);
+        }
+
+        .badge.cat-asm {
+            background: #8b5cf6;
+        }
+
+        .badge.cat-pro {
+            background: var(--warning);
+        }
+
+        .badge.cat-tpl {
+            background: var(--danger);
+        }
+
+        /* Headcount Inputs */
+        .headcount-input {
+            width: 70px;
+            padding: 10px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .headcount-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .headcount-input.day {
+            background: #fef9c3;
+        }
+
+        .headcount-input.night-ab {
+            background: #ede9fe;
+        }
+
+        .headcount-input.night-cd {
+            background: #fce7f3;
+        }
+
+        .headcount-input::-webkit-inner-spin-button,
+        .headcount-input::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+
+        .total-cell {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            text-align: center;
+            min-width: 50px;
+        }
+
+        /* Action Buttons */
+        .actions-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--light);
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            font-size: 0.9rem;
+            z-index: 100;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            background: var(--light);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .shift-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .shift-input-group label {
+            font-size: 0.8rem;
+        }
+
+        .shift-input-group input {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .summary-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tabs {
+                padding: 0 12px;
+            }
+
+            .tab {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+
+            th,
+            td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+
+            .headcount-input {
+                width: 55px;
+                padding: 8px 4px;
+                font-size: 0.9rem;
+            }
+
+            .actions-footer {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .summary-bar {
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .stat-card {
+                padding: 10px 6px;
+            }
+
+            .stat-card .number {
+                font-size: 1.3rem;
+            }
+
+            .shift-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚙️ Headcount Configuration</h1>
+            <div class="header-actions">
+                <button class="btn-header back" onclick="goBack()">← Back</button>
+                <button class="btn-header save" onclick="saveAll()">💾 Save All</button>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="summary-bar">
+            <div class="stat-card lines">
+                <div class="number" id="total-lines">27</div>
+                <div class="label">Total Lines / สาย</div>
+            </div>
+            <div class="stat-card day">
+                <div class="number" id="total-day">0</div>
+                <div class="label">Day Total / กะกลางวัน</div>
+            </div>
+            <div class="stat-card night-ab">
+                <div class="number" id="total-night-ab">0</div>
+                <div class="label">Night A/B</div>
+            </div>
+            <div class="stat-card night-cd">
+                <div class="number" id="total-night-cd">0</div>
+                <div class="label">Night C/D</div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-cat="all" onclick="filterCategory('all')">📋 All (27)</div>
+            <div class="tab" data-cat="5s" onclick="filterCategory('5s')">🟢 5S (1)</div>
+            <div class="tab" data-cat="asm" onclick="filterCategory('asm')">🟣 ASM (11)</div>
+            <div class="tab" data-cat="pro" onclick="filterCategory('pro')">🟠 PRO (6)</div>
+            <div class="tab" data-cat="tpl" onclick="filterCategory('tpl')">🔴 TPL (9)</div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 140px;">Line / สาย</th>
+                        <th class="center">🌅 Day</th>
+                        <th class="center">🌙 Night A/B</th>
+                        <th class="center">🌙 Night C/D</th>
+                        <th class="center">Total</th>
+                        <th style="width: 80px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="lines-tbody">
+                    <!-- Generated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Actions Footer -->
+        <div class="actions-footer">
+            <div>
+                <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset to Defaults</button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="exportData()">📥 Export</button>
+                <button class="btn btn-primary" onclick="saveAll()">✅ Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Edit Line Headcount</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Line Code / รหัสสาย</label>
+                    <input type="text" id="modal-line-code" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Headcount by Shift / จำนวนตามกะ</label>
+                    <div class="shift-inputs">
+                        <div class="shift-input-group">
+                            <label>🌅 Day / กลางวัน</label>
+                            <input type="number" id="modal-day" min="0" max="50">
+                        </div>
+                        <div class="shift-input-group">
+                            <label>🌙 Night A/B</label>
+                            <input type="number" id="modal-night-ab" min="0" max="50">
+                        </div>
+                        <div class="shift-input-group">
+                            <label>🌙 Night C/D</label>
+                            <input type="number" id="modal-night-cd" min="0" max="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveModal()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+    <script>
+        // Manufacturing Lines Data
+        let linesData = [
+            { code: '5S', category: '5s', day: 3, night_AB: 2, night_CD: 1 },
+            { code: 'ASM2', category: 'asm', day: 8, night_AB: 4, night_CD: 4 },
+            { code: 'ASM3-1', category: 'asm', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'ASM3-2', category: 'asm', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'ASM4', category: 'asm', day: 7, night_AB: 4, night_CD: 3 },
+            { code: 'ASM5', category: 'asm', day: 8, night_AB: 4, night_CD: 4 },
+            { code: 'ASM6', category: 'asm', day: 7, night_AB: 3, night_CD: 4 },
+            { code: 'ASM7-1', category: 'asm', day: 5, night_AB: 3, night_CD: 2 },
+            { code: 'ASM7-2', category: 'asm', day: 5, night_AB: 2, night_CD: 3 },
+            { code: 'ASM7-3', category: 'asm', day: 5, night_AB: 3, night_CD: 2 },
+            { code: 'ASM8', category: 'asm', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'ASM9', category: 'asm', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'PRO1', category: 'pro', day: 5, night_AB: 3, night_CD: 2 },
+            { code: 'PRO2', category: 'pro', day: 4, night_AB: 2, night_CD: 1 },
+            { code: 'PRO4', category: 'pro', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'PRO5', category: 'pro', day: 5, night_AB: 2, night_CD: 3 },
+            { code: 'PRO7', category: 'pro', day: 7, night_AB: 4, night_CD: 3 },
+            { code: 'PRO8', category: 'pro', day: 6, night_AB: 3, night_CD: 3 },
+            { code: 'TPL1', category: 'tpl', day: 4, night_AB: 2, night_CD: 2 },
+            { code: 'TPL2', category: 'tpl', day: 5, night_AB: 3, night_CD: 2 },
+            { code: 'TPL3', category: 'tpl', day: 4, night_AB: 2, night_CD: 2 },
+            { code: 'TPL4', category: 'tpl', day: 5, night_AB: 2, night_CD: 3 },
+            { code: 'TPL5', category: 'tpl', day: 4, night_AB: 2, night_CD: 2 },
+            { code: 'TPL6', category: 'tpl', day: 5, night_AB: 3, night_CD: 2 },
+            { code: 'TPL7', category: 'tpl', day: 4, night_AB: 2, night_CD: 2 },
+            { code: 'TPL8', category: 'tpl', day: 5, night_AB: 2, night_CD: 3 },
+            { code: 'TPL9', category: 'tpl', day: 4, night_AB: 2, night_CD: 2 }
+        ];
+
+        let currentCategory = 'all';
+        let editingLine = null;
+
+        function init() {
+            renderTable();
+            updateTotals();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('lines-tbody');
+            const filtered = currentCategory === 'all'
+                ? linesData
+                : linesData.filter(l => l.category === currentCategory);
+
+            tbody.innerHTML = filtered.map((line, idx) => `
+                <tr data-code="${line.code}">
+                    <td>
+                        <div class="line-code">
+                            <span class="badge cat-${line.category}">${line.category.toUpperCase()}</span>
+                            ${line.code}
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="number" class="headcount-input day" 
+                            value="${line.day}" min="0" max="50"
+                            onchange="updateValue('${line.code}', 'day', this.value)">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="number" class="headcount-input night-ab" 
+                            value="${line.night_AB}" min="0" max="50"
+                            onchange="updateValue('${line.code}', 'night_AB', this.value)">
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="number" class="headcount-input night-cd" 
+                            value="${line.night_CD}" min="0" max="50"
+                            onchange="updateValue('${line.code}', 'night_CD', this.value)">
+                    </td>
+                    <td class="total-cell">${line.day + line.night_AB + line.night_CD}</td>
+                    <td style="text-align: center;">
+                        <button class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.8rem;" 
+                            onclick="openEditModal('${line.code}')">✏️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateValue(lineCode, field, value) {
+            const line = linesData.find(l => l.code === lineCode);
+            if (line) {
+                line[field] = parseInt(value) || 0;
+                renderTable();
+                updateTotals();
+            }
+        }
+
+        function updateTotals() {
+            const totalDay = linesData.reduce((sum, l) => sum + l.day, 0);
+            const totalNightAB = linesData.reduce((sum, l) => sum + l.night_AB, 0);
+            const totalNightCD = linesData.reduce((sum, l) => sum + l.night_CD, 0);
+
+            document.getElementById('total-day').textContent = totalDay;
+            document.getElementById('total-night-ab').textContent = totalNightAB;
+            document.getElementById('total-night-cd').textContent = totalNightCD;
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.cat === cat);
+            });
+            renderTable();
+        }
+
+        function openEditModal(lineCode) {
+            editingLine = linesData.find(l => l.code === lineCode);
+            if (!editingLine) return;
+
+            document.getElementById('modal-line-code').value = editingLine.code;
+            document.getElementById('modal-day').value = editingLine.day;
+            document.getElementById('modal-night-ab').value = editingLine.night_AB;
+            document.getElementById('modal-night-cd').value = editingLine.night_CD;
+            document.getElementById('modal-title').textContent = `Edit ${editingLine.code} Headcount`;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('show');
+            editingLine = null;
+        }
+
+        function saveModal() {
+            if (!editingLine) return;
+
+            editingLine.day = parseInt(document.getElementById('modal-day').value) || 0;
+            editingLine.night_AB = parseInt(document.getElementById('modal-night-ab').value) || 0;
+            editingLine.night_CD = parseInt(document.getElementById('modal-night-cd').value) || 0;
+
+            renderTable();
+            updateTotals();
+            closeModal();
+            showToast(`✅ ${editingLine.code} updated!`, 'success');
+        }
+
+        function saveAll() {
+            // In real app, this would POST to API
+            console.log('Saving:', linesData);
+            showToast('✅ All changes saved!', 'success');
+        }
+
+        function resetAll() {
+            if (!confirm('Reset all headcounts to default values?')) return;
+            // Reset to defaults (mock)
+            showToast('🔄 Reset to defaults!', 'success');
+        }
+
+        function exportData() {
+            const csv = [
+                ['Line', 'Category', 'Day', 'Night A/B', 'Night C/D', 'Total'].join(','),
+                ...linesData.map(l => [
+                    l.code, l.category.toUpperCase(), l.day, l.night_AB, l.night_CD,
+                    l.day + l.night_AB + l.night_CD
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'headcount_config.csv';
+            a.click();
+            showToast('📥 Exported to CSV!', 'success');
+        }
+
+        function goBack() {
+            window.location.href = 'attendance-prototype.html';
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.className = 'toast show' + (type ? ` ${type}` : '');
+            document.getElementById('toast-msg').textContent = msg;
+            setTimeout(() => { toast.className = 'toast'; }, 2500);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-overlay') closeModal();
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

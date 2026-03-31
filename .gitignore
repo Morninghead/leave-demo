@@ -1,0 +1,92 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local Netlify folder
+.netlify
+
+
+# Environment files (contains secrets - do not commit)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Test coverage
+coverage/
+
+# Development files
+*.tmp
+*.temp
+*.bak
+*.backup
+/fonts/
+/convert-fonts.cjs
+
+# Debug and test scripts
+debug-*.js
+test-*.js
+check-*.js
+fix-*.js
+verify-*.js
+analyze-*.js
+monitor-*.js
+query-*.js
+*-diagnosis.js
+test-*.sh
+cleanup-*.sh
+investigate-*.ts
+SHOW-*.js
+
+# Specific development utilities
+init-balances.js
+init-all-balances.js
+setup-user-passwords.js
+apply-settings-from-csv.js
+add-*.js
+remove-*.js
+run-migration-*.js
+nul
+
+# Ignore quint-code submodule
+quint-code/
+
+# Agent files
+.agent/
+
+# Large/Sensitive/Artifact Files
+*.har
+*.zip
+*.xlsx
+Current_Database.json
+Current_Project_structure.txt
+leave-management-structure.txt
+*lint_output*.txt
+*error*.txt
+translation-report.txt
+missing-translations.txt
+used_keys.txt
+playwright-report.json
+test-results/
+ag_commands_dump.txt

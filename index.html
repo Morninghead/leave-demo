@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/company-icon.svg" />
+  <link rel="shortcut icon" type="image/x-icon" href="/company-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/company-icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/company-icon-16.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/company-icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/company-icon-512.png" />
+  <link rel="apple-touch-icon" href="/company-icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/company-icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/company-icon-512.png" />
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+  <!-- Standard viewport for all devices with safe area support -->
+  <!-- Note: maximum-scale=5.0 allows zooming for accessibility while preventing iOS zoom on input focus -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+  <!-- Mobile web app meta tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>SSTH-HRM Leave Management System</title>
+  <meta name="description" content="SSTH-HRM Leave Management System - Human Resources Management">
+  <meta name="keywords" content="SSTH, HR, leave management, human resources, employee management, leave requests">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script>
+    // Disable React DevTools to prevent lazy loading conflicts
+    (function () {
+      if (typeof window !== 'undefined') {
+        const devTools = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+        if (devTools) {
+          // Completely disable React DevTools during development
+          window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+            onCommitFiberRoot: function () { },
+            onCommitFiberUnmount: function () { },
+            inject: function () { },
+            onScheduleRoot: function () { },
+            onBeforeCommit: function () { },
+            supportsFiber: true,
+            render: function () { },
+            checkDCE: function () { },
+            findHostInstanceByFiber: function () { },
+            findFiberByHostInstance: function () { },
+            injectIntoDevTools: function () { },
+            onCommitMount: function () { },
+            onCommitUpdate: function () { },
+            onCommitUnmount: function () { },
+            onBeginReconcilerPass: function () { },
+            onEndReconcilerPass: function () { }
+          };
+        }
+      }
+    })();
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

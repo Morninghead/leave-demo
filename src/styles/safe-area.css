@@ -1,0 +1,65 @@
+/* Safe Area CSS for mobile devices with notches and rounded corners */
+
+/* Basic safe area support */
+@supports (padding: max(0px)) {
+
+  /* Safe area insets for all elements with safe-area-inset-* classes */
+  .safe-area-inset-top {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
+  .safe-area-inset-left {
+    padding-left: max(env(safe-area-inset-left), 0px);
+  }
+
+  .safe-area-inset-right {
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+}
+
+/* Full viewport height for mobile devices */
+@media screen and (max-width: 768px) {
+
+  html,
+  body {
+    height: -webkit-fill-available;
+    height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+  }
+
+  .mobile-full-height {
+    height: -webkit-fill-available;
+    height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+  }
+}
+
+/* iOS Safari - Allow normal scrolling (removed broken position:fixed) */
+@supports (-webkit-touch-callout: none) {
+  body {
+    /* Enable smooth scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile viewport fix */
+@viewport {
+  width: device-width;
+}
+
+/* Handle landscape orientation on mobile */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .safe-area-inset-top {
+    padding-top: max(env(safe-area-inset-top), 5px);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 5px);
+  }
+}

@@ -1,0 +1,33 @@
+// utils/nameHelper.ts
+export const getDisplayName = (
+  firstNameTh: string | null,
+  lastNameTh: string | null,
+  firstNameEn: string | null,
+  lastNameEn: string | null,
+  language: 'th' | 'en' = 'th'
+): string => {
+  // ตรวจสอบภาษาที่เลือก
+  if (language === 'th') {
+    // ถ้ามีชื่อไทย ใช้ไทย
+    if (firstNameTh && lastNameTh) {
+      return `${firstNameTh} ${lastNameTh}`;
+    }
+    // ถ้าไม่มีไทย fallback เป็นอังกฤษ
+    if (firstNameEn && lastNameEn) {
+      return `${firstNameEn} ${lastNameEn}`;
+    }
+    // ถ้ามีแค่ first name
+    return firstNameTh || firstNameEn || 'ผู้ใช้งาน';
+  } else {
+    // ถ้ามีชื่ออังกฤษ ใช้อังกฤษ
+    if (firstNameEn && lastNameEn) {
+      return `${firstNameEn} ${lastNameEn}`;
+    }
+    // ถ้าไม่มีอังกฤษ fallback เป็นไทย
+    if (firstNameTh && lastNameTh) {
+      return `${firstNameTh} ${lastNameTh}`;
+    }
+    // ถ้ามีแค่ first name
+    return firstNameEn || firstNameTh || 'User';
+  }
+};

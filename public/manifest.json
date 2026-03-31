@@ -1,0 +1,26 @@
+{
+    "name": "Portfolio Leave Demo",
+    "short_name": "Leave Demo",
+    "description": "Portfolio demo for leave requests, approvals, probation, and reporting workflows",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/company-icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "lang": "th",
+    "dir": "ltr",
+    "scope": "/",
+    "prefer_related_applications": false
+}
