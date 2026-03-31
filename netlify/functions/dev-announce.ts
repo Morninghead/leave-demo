@@ -1,8 +1,8 @@
 import { Handler } from '@netlify/functions';
 import axios from 'axios';
 
-const TELEGRAM_BOT_TOKEN = '7704111290:AAEi6Kw0XmaW9Q6IFQwsLQf9sGhjURGqqrY';
-const TELEGRAM_CHAT_ID = '-1002667543508';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '';
 
 export const handler: Handler = async (event, context) => {
     if (event.httpMethod !== 'POST') {
@@ -14,6 +14,13 @@ export const handler: Handler = async (event, context) => {
 
         if (!message) {
             return { statusCode: 400, body: JSON.stringify({ error: 'Message is required' }) };
+        }
+
+        if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Telegram is not configured for this environment' }),
+            };
         }
 
         const payload = {

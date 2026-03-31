@@ -108,7 +108,7 @@ export async function getChannelConfig(): Promise<ChannelConfig> {
                 group_id: process.env.LINE_GROUP_ID || '',
             },
             telegram: {
-                bot_token: process.env.TELEGRAM_BOT_TOKEN || '7704111290:AAEi6Kw0XmaW9Q6IFQwsLQf9sGhjURGqqrY',
+                bot_token: process.env.TELEGRAM_BOT_TOKEN || '',
                 chat_id: process.env.TELEGRAM_CHAT_ID || '',
             },
         };

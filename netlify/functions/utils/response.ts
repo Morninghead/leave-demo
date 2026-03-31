@@ -1,7 +1,16 @@
+function getCorsOrigin() {
+  return process.env.CORS_ALLOW_ORIGIN
+    || process.env.APP_URL
+    || process.env.VITE_APP_URL
+    || process.env.URL
+    || process.env.DEPLOY_PRIME_URL
+    || '*';
+}
+
 export function successResponse(data: any, statusCode: number = 200, requestId?: string) {
   const headers: { [key: string]: string } = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' ? 'https://shinshin-leave-system.netlify.app' : '*',
+    'Access-Control-Allow-Origin': getCorsOrigin(),
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Credentials': 'true',
@@ -36,7 +45,7 @@ export function successResponse(data: any, statusCode: number = 200, requestId?:
 export function errorResponse(message: string, statusCode: number = 400, requestId?: string) {
   const headers: { [key: string]: string } = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' ? 'https://shinshin-leave-system.netlify.app' : '*',
+    'Access-Control-Allow-Origin': getCorsOrigin(),
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Credentials': 'true',
@@ -73,7 +82,7 @@ export function handleCORS(event: any) {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': process.env.NODE_ENV === 'production' ? 'https://shinshin-leave-system.netlify.app' : '*',
+        'Access-Control-Allow-Origin': getCorsOrigin(),
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Credentials': 'true',
